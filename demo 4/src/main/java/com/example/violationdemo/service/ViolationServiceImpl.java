@@ -30,8 +30,7 @@ public class ViolationServiceImpl implements ViolationService {
 
     @Override
     public List<Violation> getAllViolations() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.violationRepository.findAll();
     }
 
     @Override
