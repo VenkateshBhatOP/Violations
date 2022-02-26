@@ -1,9 +1,11 @@
 package com.example.violationdemo.service;
 
 import java.util.List;
+import java.util.HashSet;
 
 import javax.transaction.Transactional;
 
+import com.example.violationdemo.exception.ResourceNotFoundException;
 import com.example.violationdemo.model.Violation;
 import com.example.violationdemo.repository.ViolationRepository;
 
@@ -19,7 +21,29 @@ public class ViolationServiceImpl implements ViolationService {
 
     @Override
     public Violation createViolation(Violation violation) {
-        return this.violationRepository.save(violation);
+
+        if (violation == null) {
+            // Raise Error here
+            return null;
+        }
+
+        // File + _ + Line + _ + Desc
+        HashSet<String> uniqueEntries = new HashSet<>();
+
+        violationRepository.findAll().forEach(e -> {
+            uniqueEntries.add(e.getFile() + "_" + e.getLineNumber() + "_" + e.getErrorDesc());
+        });
+
+        String newEntry = violation.getFile() + "_" + violation.getLineNumber() + "_" + violation.getErrorDesc();
+
+        if (!uniqueEntries.contains(newEntry)) {
+            this.violationRepository.save(violation);
+        } else {
+            // Throw error here
+            throw new ResourceNotFoundException("Enter proper data");
+        }
+
+        return violation;
     }
 
     @Override
